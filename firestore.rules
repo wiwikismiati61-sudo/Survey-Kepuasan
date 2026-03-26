@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: surveys
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (optional)
+    //   - status: string (optional)
+    //   - q1: number (required, 1-5)
+    //   - q2: number (required, 1-5)
+    //   - q3: number (required, 1-5)
+    //   - q4: number (required, 1-5)
+    //   - q5: number (required, 1-5)
+    //   - q6: number (required, 1-5)
+    //   - q7: number (required, 1-5)
+    //   - q8: number (required, 1-5)
+    //   - q9: number (required, 1-5)
+    //   - q10: number (required, 1-5)
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidRating(val) {
+      return val is number && val >= 1 && val <= 5;
+    }
+
+    function isValidSurvey() {
+      let data = request.resource.data;
+      let requiredFields = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'createdAt'];
+      let optionalFields = ['name', 'status'];
+      
+      return hasRequiredFields(requiredFields) &&
+             hasOnlyAllowedFields(requiredFields.concat(optionalFields)) &&
+             isValidRating(data.q1) &&
+             isValidRating(data.q2) &&
+             isValidRating(data.q3) &&
+             isValidRating(data.q4) &&
+             isValidRating(data.q5) &&
+             isValidRating(data.q6) &&
+             isValidRating(data.q7) &&
+             isValidRating(data.q8) &&
+             isValidRating(data.q9) &&
+             isValidRating(data.q10) &&
+             data.createdAt is timestamp &&
+             (!('name' in data) || (data.name is string && data.name.size() <= 100)) &&
+             (!('status' in data) || (data.status in ['Siswa', 'Guru', 'Orang Tua', 'Lainnya', '']));
+    }
+
+    match /surveys/{surveyId} {
+      // Allow anyone to read the surveys for the dashboard
+      allow read: if true;
+      // Allow anyone to create a survey if it's valid
+      allow create: if isValidSurvey();
+      // Do not allow updates or deletes
+      allow update, delete: if false;
+    }
+  }
+}

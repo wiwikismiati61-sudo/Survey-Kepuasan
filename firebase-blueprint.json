@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "SurveyResponse": {
+      "title": "Survey Response",
+      "description": "A response to the SIAP SPANJU satisfaction survey.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the respondent (optional)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Siswa", "Guru", "Orang Tua", "Lainnya", ""],
+          "description": "Status of the respondent (optional)"
+        },
+        "q1": { "type": "number", "description": "Aplikasi SIAP SPANJU mudah digunakan" },
+        "q2": { "type": "number", "description": "Tampilan aplikasi menarik dan mudah dipahami" },
+        "q3": { "type": "number", "description": "Aplikasi berjalan dengan cepat dan lancar" },
+        "q4": { "type": "number", "description": "Informasi dalam aplikasi jelas dan mudah dimengerti" },
+        "q5": { "type": "number", "description": "Fitur dalam aplikasi sudah lengkap" },
+        "q6": { "type": "number", "description": "Aplikasi membantu kegiatan sekolah" },
+        "q7": { "type": "number", "description": "Aplikasi membantu meningkatkan kedisiplinan siswa" },
+        "q8": { "type": "number", "description": "Aplikasi mudah diakses kapan saja" },
+        "q9": { "type": "number", "description": "Aplikasi aman dan menjaga privasi pengguna" },
+        "q10": { "type": "number", "description": "Saya puas menggunakan aplikasi SIAP SPANJU" },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the survey was submitted"
+        }
+      },
+      "required": ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "createdAt"]
+    }
+  },
+  "firestore": {
+    "surveys/{surveyId}": {
+      "schema": {
+        "$ref": "#/entities/SurveyResponse"
+      },
+      "description": "Collection of all survey responses."
+    }
+  }
+}
