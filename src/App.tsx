@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CheckCircle2, BarChart3, ClipboardList, Loader2 } from 'lucide-react';
+import { CheckCircle2, BarChart3, ClipboardList, Loader2, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const QUESTIONS = [
   "Aplikasi SIAP SPANJU mudah digunakan",
@@ -108,6 +109,32 @@ export default function App() {
         RataRata: parseFloat(average.toFixed(2))
       };
     });
+  };
+
+  const handleDownloadExcel = () => {
+    const dataToExport = surveys.map(survey => {
+      const date = survey.createdAt?.toDate ? survey.createdAt.toDate().toLocaleString('id-ID') : new Date().toLocaleString('id-ID');
+      return {
+        'Tanggal Waktu': date,
+        'Nama': survey.name || '-',
+        'Status': survey.status || '-',
+        'P1: Aplikasi mudah digunakan': survey.q1,
+        'P2: Tampilan menarik': survey.q2,
+        'P3: Berjalan cepat': survey.q3,
+        'P4: Informasi jelas': survey.q4,
+        'P5: Fitur lengkap': survey.q5,
+        'P6: Membantu kegiatan': survey.q6,
+        'P7: Meningkatkan kedisiplinan': survey.q7,
+        'P8: Mudah diakses': survey.q8,
+        'P9: Aman dan menjaga privasi': survey.q9,
+        'P10: Puas menggunakan': survey.q10,
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Survei");
+    XLSX.writeFile(workbook, "Hasil_Survei_SIAP_SPANJU.xlsx");
   };
 
   return (
@@ -270,11 +297,21 @@ export default function App() {
                 <h2 className="text-2xl font-bold text-slate-800">Dashboard Kepuasan</h2>
                 <p className="text-slate-500">Ringkasan hasil survei aplikasi SIAP SPANJU</p>
               </div>
-              <div className="bg-blue-50 px-6 py-4 rounded-xl border border-blue-100 text-center min-w-[150px]">
-                <p className="text-sm font-medium text-blue-600 mb-1">Total Responden</p>
-                <p className="text-4xl font-bold text-blue-700">
-                  {isLoadingData ? <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-400" /> : surveys.length}
-                </p>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={handleDownloadExcel}
+                  disabled={surveys.length === 0 || isLoadingData}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Download Excel</span>
+                </button>
+                <div className="bg-blue-50 px-6 py-4 rounded-xl border border-blue-100 text-center min-w-[150px]">
+                  <p className="text-sm font-medium text-blue-600 mb-1">Total Responden</p>
+                  <p className="text-4xl font-bold text-blue-700">
+                    {isLoadingData ? <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-400" /> : surveys.length}
+                  </p>
+                </div>
               </div>
             </div>
 
