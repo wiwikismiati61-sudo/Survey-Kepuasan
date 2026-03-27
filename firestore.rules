@@ -40,7 +40,7 @@ service cloud.firestore {
     function isValidSurvey() {
       let data = request.resource.data;
       let requiredFields = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'createdAt'];
-      let optionalFields = ['name', 'status'];
+      let optionalFields = ['name', 'status', 'feedback'];
       
       return hasRequiredFields(requiredFields) &&
              hasOnlyAllowedFields(requiredFields.concat(optionalFields)) &&
@@ -56,7 +56,8 @@ service cloud.firestore {
              isValidRating(data.q10) &&
              data.createdAt is timestamp &&
              (!('name' in data) || (data.name is string && data.name.size() <= 100)) &&
-             (!('status' in data) || (data.status in ['Siswa', 'Guru', 'Orang Tua', 'Lainnya', '']));
+             (!('status' in data) || (data.status in ['Siswa', 'Guru', 'Orang Tua', 'Lainnya', ''])) &&
+             (!('feedback' in data) || (data.feedback is string && data.feedback.size() <= 2000));
     }
 
     match /surveys/{surveyId} {

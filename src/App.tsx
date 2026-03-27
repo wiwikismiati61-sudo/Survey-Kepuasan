@@ -24,6 +24,7 @@ export default function App() {
   const [view, setView] = useState<'form' | 'dashboard'>('form');
   const [name, setName] = useState('');
   const [status, setStatus] = useState('');
+  const [feedback, setFeedback] = useState('');
   const [ratings, setRatings] = useState<Record<number, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -67,6 +68,7 @@ export default function App() {
       const surveyData = {
         name: name.trim(),
         status,
+        feedback: feedback.trim(),
         q1: ratings[0],
         q2: ratings[1],
         q3: ratings[2],
@@ -85,6 +87,7 @@ export default function App() {
       // Reset form
       setName('');
       setStatus('');
+      setFeedback('');
       setRatings({});
     } catch (err: any) {
       console.error("Error submitting survey:", err);
@@ -128,6 +131,7 @@ export default function App() {
         'P8: Mudah diakses': survey.q8,
         'P9: Aman dan menjaga privasi': survey.q9,
         'P10: Puas menggunakan': survey.q10,
+        'Kritik & Saran': survey.feedback || '-',
       };
     });
 
@@ -265,6 +269,19 @@ export default function App() {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* Kritik dan Saran */}
+                <div className="mt-8 p-6 bg-slate-50 rounded-xl border border-slate-200">
+                  <label htmlFor="feedback" className="block text-sm font-semibold text-slate-800 mb-2">Kritik dan Saran (Opsional)</label>
+                  <textarea
+                    id="feedback"
+                    rows={4}
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-y"
+                    placeholder="Tuliskan kritik dan saran Anda untuk aplikasi SIAP SPANJU..."
+                  ></textarea>
                 </div>
 
                 {error && (

@@ -14,6 +14,10 @@
           "enum": ["Siswa", "Guru", "Orang Tua", "Lainnya", ""],
           "description": "Status of the respondent (optional)"
         },
+        "feedback": {
+          "type": "string",
+          "description": "Kritik dan saran dari responden (opsional)"
+        },
         "q1": { "type": "number", "description": "Aplikasi SIAP SPANJU mudah digunakan" },
         "q2": { "type": "number", "description": "Tampilan aplikasi menarik dan mudah dipahami" },
         "q3": { "type": "number", "description": "Aplikasi berjalan dengan cepat dan lancar" },
