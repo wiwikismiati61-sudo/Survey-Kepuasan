@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, onSnapshot, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CheckCircle2, BarChart3, ClipboardList, Loader2, Download } from 'lucide-react';
+import { CheckCircle2, BarChart3, ClipboardList, Loader2, Download, Eye, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 const QUESTIONS = [
@@ -29,6 +29,7 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [showRespondentsModal, setShowRespondentsModal] = useState(false);
 
   const [surveys, setSurveys] = useState<any[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -323,11 +324,19 @@ export default function App() {
                   <Download className="w-4 h-4" />
                   <span className="hidden sm:inline">Download Excel</span>
                 </button>
-                <div className="bg-blue-50 px-6 py-4 rounded-xl border border-blue-100 text-center min-w-[150px]">
+                <div className="bg-blue-50 px-6 py-4 rounded-xl border border-blue-100 text-center min-w-[150px] flex flex-col items-center justify-center">
                   <p className="text-sm font-medium text-blue-600 mb-1">Total Responden</p>
-                  <p className="text-4xl font-bold text-blue-700">
+                  <p className="text-4xl font-bold text-blue-700 mb-3">
                     {isLoadingData ? <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-400" /> : surveys.length}
                   </p>
+                  <button 
+                    onClick={() => setShowRespondentsModal(true)}
+                    disabled={surveys.length === 0}
+                    className="px-4 py-1.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Lihat
+                  </button>
                 </div>
               </div>
             </div>
@@ -394,6 +403,48 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* Modal Daftar Responden */}
+      {showRespondentsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Eye className="w-5 h-5 text-blue-600" />
+                Daftar Responden
+              </h3>
+              <button 
+                onClick={() => setShowRespondentsModal(false)}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1">
+              {surveys.length > 0 ? (
+                <div className="space-y-3">
+                  {surveys.map((survey, idx) => (
+                    <div key={survey.id || idx} className="p-4 rounded-xl border border-slate-100 bg-white hover:border-blue-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-sm">
+                      <div>
+                        <p className="font-semibold text-slate-800">{survey.name || 'Anonim'}</p>
+                        <p className="text-sm text-slate-500">{survey.status || 'Tidak ada status'}</p>
+                      </div>
+                      <div className="text-left sm:text-right">
+                        <p className="text-xs font-medium text-slate-400">Tanggal Pengisian</p>
+                        <p className="text-sm text-slate-600">
+                          {survey.createdAt?.toDate ? survey.createdAt.toDate().toLocaleString('id-ID') : '-'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-slate-500 py-8">Belum ada responden.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
